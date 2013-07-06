@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>Zone Entry - Web Management</title>
+      <strong><link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"></strong>
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.jgrowl.css') }}">
+
+      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+      <script type="text/javascript" src="{{ url_for('static', filename='javascript/jquery.growl.js') }}"></script>
+      <script src="{{ url_for('static', filename='javascript/script.js') }}" type="text/javascript" charset="utf-8" async defer></script>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1 class="logo">Zone Entry Manager</h1>
+ 	<nav>
+	  <ul class="menu">
+	    <li><a href="{{ url_for('index') }}">Home</a></li>
+	    <li><a href="{{ url_for('index') }}">About</a></li>
+      <li><a href="{{ url_for('index') }}">Login</a></li>
+	  </ul>
+	</nav>
+      </div>
+     </header>
+    <div class="container">
+      {% block content %}
+      {% endblock %}
+    </div>
+  </body>
+</html>
