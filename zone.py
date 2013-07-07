@@ -42,6 +42,11 @@ def index():
 def about():
 	return render_template('about.html')
 
+# main page for adding zone entries
+@app.route('/addze')
+def addze():
+	return render_template('add-ze.html')
+
 # sign up users
 @app.route('/register', methods=['GET', 'POST'])
 def register():

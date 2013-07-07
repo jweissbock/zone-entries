@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h2>Add Zone Entry</h2>
+  <p>Need gameid, and home or away here</p>
+  <div class="text-align: center">
+  	<table class="margin: 0 auto" border="1">
+  		<tr>
+  			<td>Period</td>
+  			<td>Time</td>
+  			<td>Exit Type</td>
+  			<td>Player</td>
+  			<td>Pressure</td>
+  			<td>Strength</td>
+  			<td>&nbsp;</td>
+  		</tr>
+  		<tr>
+  			<td><select><option value=1>1</option><option value=2>2</option><option value=3>3</option></select></td>
+  			<td><input type=text /></td>
+  			<td><select>
+  					<option value="C">(C) Carry</option>
+  					<option value="P">(P) Pass</option>
+  					<option value="CH">(CH) Chip</option>
+  					<option value="I">(I) Icing</option>
+  					<option value="FP">(FP) Failed Pass</option>
+  					<option value="PT">(PT) Pass Turnover</option>
+  					<option value="FC">(FC) Failed Carry</option>
+  					<option value="CT">(CT) Carry Turnover</option>
+  					<option value="T">(T) Turnover</option>
+  					<option value="X">(X) Other</option>
+  				</select></td>
+  			<td><input type=text /></td>
+  			<td><select><option value="Y">Yes</option><option value="N">No</option></select></td>
+  			<td><select>
+  					<option selected>5v5</option>
+  					<option>5v4</option>
+  					<option>5v3</option>
+  					<option>4v5</option>
+  					<option>4v4</option>
+  					<option>4v3</option>
+  					<option>3v5</option>
+  					<option>3v4</option>	
+  				</select></td>
+  			<td><input type="button" value="Delete" /></td>
+  		</tr>
+  	</table>
+  	<p>Need a save button here</p>
+  </div>
+{% endblock %}
