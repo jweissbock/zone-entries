@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h2>My Recorded Zone Entries</h2>
+  <ul>
+	{% for d in alldata %}
+  		<li>Game ID: {{ d[0] }} | <a href="{{ url_for('addze', gid=d[0]) }}">Edit</a></li>
+	{% else %}
+  		<li>No zone entries tracked yet.</li>
+  	{% endfor %}
+  </ul>
+{% endblock %}

@@ -33,6 +33,18 @@ def teardown_request(exception):
 	if db is not None:
 		db.close()
 
+# redirects if user is not logged in
+def loggedin():
+	if not session.get('logged_in'):
+		return redirect(url_for('login'))
+
+# get user id
+# get users ID
+def getUserId():
+	cur = g.db.execute('SELECT id FROM users WHERE email=?', [session.get('logged_in')])
+	fetchd = cur.fetchone()
+	return fetchd[0]
+
 # our main views
 @app.route('/')
 def index():
@@ -42,12 +54,31 @@ def index():
 def about():
 	return render_template('about.html')
 
+@app.route('/myze')
+def myze():
+	loggedin()
+	# get users ID
+	userid = getUserId()
+	# get all users games
+	cur = g.db.execute('SELECT gameid FROM entries WHERE tracker = ? GROUP BY gameid ORDER BY gameid DESC', [userid])
+	bigdata = [list(row) for row in cur.fetchall()]
+	#return render_template('allgames.html', alldata=bigdata)
+	return render_template('my-ze.html', alldata=bigdata)
+
 # main page for adding zone entries
 @app.route('/addze')
-def addze():
-	if not session.get('logged_in'):
-		return redirect(url_for('login'))
-	return render_template('add-ze.html')
+@app.route('/addze/<int:gid>')	
+def addze(gid=None):
+	loggedin()
+	# deal with editting
+	# if gid not None, then load all data into an object and pass it
+	bigdata = None
+	if gid is not None:
+		gidyear = str(gid)[:8]
+		gameid = str(gid)[8:]
+		cur = g.db.execute('SELECT * FROM entries WHERE tracker = ? and gameid = ? ORDER BY id', [getUserId(), gid])
+		bigdata = [list(row) for row in cur.fetchall()]
+	return render_template('add-ze.html', data=bigdata)
 
 # save data
 @app.route('/saveze', methods=['POST'])
@@ -74,7 +105,7 @@ def saveze():
 		response['message'] = "Game ID is not valid"
 		return json.dumps(response)
 	# check if team in H or A
-	elif team not in ['H', 'A"']:
+	elif team not in ['H', 'A']:
 		response['message'] = "Team is not valid"
 		return json.dumps(response)
 

@@ -1,6 +1,43 @@
 {% extends "layout.html" %}
 {% block content %}
-  <h2>Add Zone Entry</h2>
+{% if data != None %}
+	<script type="text/javascript">
+	$(window).load(function(){
+		var gameid = null;
+		var team = null;
+	{% for d in data %}
+		// get last row
+		var row = $("#zentries tr:last");
+		// lastrow.period = 4
+		row.find("select[name=period]").val({{ d[4] }});
+		// lastrow.time = 5
+		row.find("input[name=time]").val('{{ d[5] }}');
+		// lastrow.exit = 6
+		row.find("select[name=exit]").val('{{ d[6] }}')
+		// lastrow.player = 7
+		row.find("input[name=player]").val('{{ d[7] }}');
+		// lastrow.strength = 9
+		row.find("select[name=strength]").val('{{ d[9] }}')
+		// lastrow.pressure = 8
+		row.find("select[name=pressure]").val('{{ d[8] }}')
+		// save other variables
+		gameid = {{ d[1] }};
+		team = '{{ d[3] }}';
+		// add new row
+		$("#NewRow").click();
+	{% endfor %}
+		// game id year and number
+		gameid = gameid.toString();
+		gameidyear = gameid.substr(0,8);
+		$("#gameidyear").val(gameidyear);
+		gameid = gameid.substring(8);
+		$("#gameid").val(gameid);
+		// select the house
+		$("#team").val(team);
+	});
+	</script>
+{% endif %}
+  <h2>Add Zone Exit</h2>
   <form id="addZE">
   <dl>
   	<dt>Game ID:</dt>
