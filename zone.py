@@ -1,4 +1,4 @@
-import sqlite3, re, hashlib
+import sqlite3, re, hashlib, json
 from flask import Flask, request, session, g, redirect, url_for, \
 	abort, render_template, flash
 from contextlib import closing
@@ -45,7 +45,95 @@ def about():
 # main page for adding zone entries
 @app.route('/addze')
 def addze():
+	if not session.get('logged_in'):
+		return redirect(url_for('login'))
 	return render_template('add-ze.html')
+
+# save data
+@app.route('/saveze', methods=['POST'])
+def saveze():
+	response = {}
+	response['success'] = False
+	response['message'] = None
+	response['row'] = -1
+	# check if logged in
+	if not session.get('logged_in'):
+		response['message'] = "Please login."
+		return json.dumps(response)
+	gameidyear = request.form['gameidyear']
+	gameid = request.form['gameid']
+	gid = gameidyear + gameid
+	team = request.form['team']
+	zentries = request.form['table']
+	# check if gameidyear is 8 digit number
+	if len(gameidyear) != 8 and not gameidyear.isdigit():
+		response['message'] = "Game ID Year is not valid."
+		return json.dumps(response)
+	# check if gameid is a 5 digit number
+	elif len(gameid) != 5 and not gameid.isdigit():
+		response['message'] = "Game ID is not valid"
+		return json.dumps(response)
+	# check if team in H or A
+	elif team not in ['H', 'A"']:
+		response['message'] = "Team is not valid"
+		return json.dumps(response)
+
+	# try and decode json
+	zentries = json.loads(zentries)
+	loop = 1
+
+	# loop through
+	for ze in zentries:
+		response['row'] = loop
+		# check if period in 1, 2, 3
+		if ze['period'] not in ['1','2','3']:
+			response['message'] = 'ZE %s does not have a valid period' % (loop)
+			return json.dumps(response)
+		# check if time is in dd:dd
+		elif len(ze['time']) not in [4,5] or ':' not in ze['time']:
+			response['message'] = 'ZE %s does not have a valid time' % (loop)
+			return json.dumps(response)
+		# check if exit 1 of 10
+		elif ze['exit'] not in ['C', 'P', 'CH', 'I', 'FP', 'PT', 'FC', 'CT', 'T', 'X']: 
+			response['message'] = 'ZE %s does not have a valid exit type' % (loop)
+			return json.dumps(response)
+		# check if player is d or OPP
+		elif not ze['player'].isdigit() and ze['player'] != "OPP":
+			response['message'] = 'ZE %s does not have a valid Player' % (loop)
+			return json.dumps(response)
+		# check if stength is dvd
+		elif len(ze['strength']) != 3:
+			response['message'] = 'ZE %s does not have a valid strength' % (loop)
+			return json.dumps(response)
+		# check if pressure Y or N
+		elif ze['pressure'] not in ['Y', 'N']:
+			response['message'] = 'ZE %s does not have a valid pressure' % (loop)
+			return json.dumps(response)
+		loop += 1
+	# get user id from session
+	cur = g.db.execute('SELECT id FROM users WHERE email=?', [session.get('logged_in')])
+	fetchd = cur.fetchone()
+	if fetchd is None:
+		response['message'] = 'Something has gone wrong - you don\'t exist'
+		return json.dumps(response)
+	userid = fetchd[0]
+	try:
+		# delete all entries for this game for this user
+		g.db.execute('DELETE FROM entries WHERE gameid = ? and tracker = ?', [gid, userid])
+		g.db.commit()
+		# loop through entries again
+		for ze in zentries:
+			# save each item
+			g.db.execute('INSERT INTO entries (gameid, tracker, team, period, time, exittype, player, pressure, strength) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+							[gid, userid, team, ze['period'], ze['time'], ze['exit'], ze['player'], ze['pressure'], ze['strength']])
+			g.db.commit()
+	except:
+		response['message'] = 'Something went wrong with saving on the server side.  Please contact Josh.'
+		return json.dumps(response)
+	# response
+	response['success'] = True
+	response['message'] = 'Successfully saved.'
+	return json.dumps(response)
 
 # sign up users
 @app.route('/register', methods=['GET', 'POST'])

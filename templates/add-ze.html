@@ -4,11 +4,11 @@
   <form id="addZE">
   <dl>
   	<dt>Game ID:</dt>
-  	<dd><select><option value="20122013">2012-2013</option>
-  				<option value="20132014">2013-2014</option></select>
-  		<input type="text" /></dd>
+  	<dd><select id="gameidyear" name="gameidyear"><option value="20122013">2012-2013</option>
+  							  <option value="20132014">2013-2014</option></select>
+  		<input id="gameid" name="gameid" type="text" /></dd>
   	<dt>Team</dt>
-  	<dd><select><option value="H">Home</option><option value="A">Away</option></select></dd>
+  	<dd><select id="team" name="team"><option value="H">Home</option><option value="A">Away</option></select></dd>
   </dl>
   <div style="text-align: center">
   	<table id="zentries" style="margin: 0 auto;" border="0" >
@@ -24,9 +24,9 @@
   		</tr>
   		<tr>
   			<td class="NewCell"><input type="button" id="NewRow" value="(+)" /></td>
-  			<td><select><option value=1>1</option><option value=2>2</option><option value=3>3</option></select></td>
-  			<td><input type=text /></td>
-  			<td><select>
+  			<td><select name="period"><option value=1>1</option><option value=2>2</option><option value=3>3</option></select></td>
+  			<td><input name="time" type=text /></td>
+  			<td><select name="exit">
   					<option value="C">(C) Carry</option>
   					<option value="P">(P) Pass</option>
   					<option value="CH">(CH) Chip</option>
@@ -38,9 +38,9 @@
   					<option value="T">(T) Turnover</option>
   					<option value="X">(X) Other</option>
   				</select></td>
-  			<td><input type=text /></td>
-  			<td><select><option value="Y">Yes</option><option value="N">No</option></select></td>
-  			<td><select>
+  			<td><input name="player" type=text /></td>
+  			<td><select name="pressure"><option value="Y">Yes</option><option value="N">No</option></select></td>
+  			<td><select name="strength">
   					<option selected>5v5</option>
   					<option>5v4</option>
   					<option>5v3</option>

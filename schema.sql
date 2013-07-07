@@ -11,6 +11,7 @@ create table entries (
 	id integer primary key autoincrement, 
 	gameid integer not null,
 	tracker integer not null,
+	team text not null,
 	period integer not null,
 	time integer not null,
 	exittype text not null,
