@@ -1,4 +1,4 @@
-import sqlite3
+import sqlite3, re, hashlib
 from flask import Flask, request, session, g, redirect, url_for, \
 	abort, render_template, flash
 from contextlib import closing
@@ -8,7 +8,7 @@ DATABASE = 'zone.db'
 DEBUG = True
 SECRET_KEY = 'I DONT KNOW WHAT IM DOING'
 USERNAME = 'admin'
-password = 'default'
+PASSWORD = 'default'
 
 # out application
 app = Flask(__name__)
@@ -37,6 +37,51 @@ def teardown_request(exception):
 @app.route('/')
 def index():
 	return render_template('index.html')
+
+# sign up users
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+	error = None
+	if request.method == 'POST':
+		# count rows
+		cur = g.db.execute('SELECT * FROM users WHERE email=?', [request.form['email']])
+		if not re.match(r'[^@]+@[^@]+\.[^@]+', request.form['email']):
+			error = 'This is not a valid email.'
+		elif cur.fetchone() is not None:
+			error = 'This email is already in use.'
+		elif len(request.form['password']) < 8:
+			error = 'The password must be a minimum of 8 characters.'
+		else:
+			password = hashlib.sha224(request.form['password']).hexdigest()
+			g.db.execute('INSERT INTO users (email, password) VALUES (?,?)',
+				[request.form['email'], password])
+			g.db.commit()
+			session['logged_in'] = True
+			flash('You\'ve successfully registered!')
+			return redirect(url_for('index'))
+	return render_template('register.html', error=error)
+
+# login
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+	error = None
+	if request.method == 'POST':
+		if request.form['username'] != app.config['USERNAME']:
+			error = 'Invalid username!'
+		elif request.form['password'] != app.config['PASSWORD']:
+			error = 'Invalid password'
+		else:
+			session['logged_in'] = True
+			flash('You were logged in')
+			return redirect(url_for('index'))
+	return render_template('login.html', error=error)
+
+#logout
+@app.route('/logout')
+def logout():
+	session.pop('logged_in', None)
+	flash('You were logged out')
+	return redirect(url_for('index'))
 
 # run the app
 if __name__ == '__main__':
