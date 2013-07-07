@@ -56,7 +56,7 @@ def register():
 			g.db.execute('INSERT INTO users (email, password) VALUES (?,?)',
 				[request.form['email'], password])
 			g.db.commit()
-			session['logged_in'] = True
+			session['logged_in'] = request.form['email']
 			flash('You\'ve successfully registered!')
 			return redirect(url_for('index'))
 	return render_template('register.html', error=error)
@@ -66,12 +66,14 @@ def register():
 def login():
 	error = None
 	if request.method == 'POST':
-		if request.form['username'] != app.config['USERNAME']:
-			error = 'Invalid username!'
-		elif request.form['password'] != app.config['PASSWORD']:
-			error = 'Invalid password'
+		username = request.form['username']
+		password = password = hashlib.sha224(request.form['password']).hexdigest()
+		cur = g.db.execute('SELECT * FROM users WHERE email=? AND password=?', [username, password])
+		fetchd = cur.fetchone()
+		if fetchd is None:
+			error = 'Invalid login credentials.'
 		else:
-			session['logged_in'] = True
+			session['logged_in'] = username
 			flash('You were logged in')
 			return redirect(url_for('index'))
 	return render_template('login.html', error=error)
