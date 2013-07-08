@@ -8,6 +8,18 @@ create table users (
 
 drop table if exists entries;
 create table entries (
+	id integer primary key autoincrement,
+	gameid integer not null,
+	tracker integer not null,
+	team text not null,
+	period integer not null,
+	time text not null,
+	etype text not null,
+	player text not null
+);
+
+drop table if exists exits;
+create table exits (
 	id integer primary key autoincrement, 
 	gameid integer not null,
 	tracker integer not null,

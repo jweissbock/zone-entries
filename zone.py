@@ -60,7 +60,7 @@ def myze():
 	# get users ID
 	userid = getUserId()
 	# get all users games
-	cur = g.db.execute('SELECT gameid FROM entries WHERE tracker = ? GROUP BY gameid ORDER BY gameid DESC', [userid])
+	cur = g.db.execute('SELECT gameid FROM exits WHERE tracker = ? GROUP BY gameid ORDER BY gameid DESC', [userid])
 	bigdata = [list(row) for row in cur.fetchall()]
 	#return render_template('allgames.html', alldata=bigdata)
 	return render_template('my-ze.html', alldata=bigdata)
@@ -76,7 +76,7 @@ def addze(gid=None):
 	if gid is not None:
 		gidyear = str(gid)[:8]
 		gameid = str(gid)[8:]
-		cur = g.db.execute('SELECT * FROM entries WHERE tracker = ? and gameid = ? ORDER BY id', [getUserId(), gid])
+		cur = g.db.execute('SELECT * FROM exits WHERE tracker = ? and gameid = ? ORDER BY id', [getUserId(), gid])
 		bigdata = [list(row) for row in cur.fetchall()]
 	return render_template('add-ze.html', data=bigdata)
 
@@ -150,12 +150,12 @@ def saveze():
 	userid = fetchd[0]
 	try:
 		# delete all entries for this game for this user
-		g.db.execute('DELETE FROM entries WHERE gameid = ? and tracker = ?', [gid, userid])
+		g.db.execute('DELETE FROM exits WHERE gameid = ? and tracker = ?', [gid, userid])
 		g.db.commit()
 		# loop through entries again
 		for ze in zentries:
 			# save each item
-			g.db.execute('INSERT INTO entries (gameid, tracker, team, period, time, exittype, player, pressure, strength) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+			g.db.execute('INSERT INTO exits (gameid, tracker, team, period, time, exittype, player, pressure, strength) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
 							[gid, userid, team, ze['period'], ze['time'], ze['exit'], ze['player'], ze['pressure'], ze['strength']])
 			g.db.commit()
 	except:
