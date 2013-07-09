@@ -33,11 +33,6 @@ def teardown_request(exception):
 	if db is not None:
 		db.close()
 
-# redirects if user is not logged in
-def loggedin():
-	if not session.get('logged_in'):
-		return redirect(url_for('login'))
-
 # get user id
 # get users ID
 def getUserId():
@@ -57,11 +52,14 @@ def about():
 # zone entries
 @app.route('/addzen')
 def addzen():
+	if not session.get('logged_in'):
+		return redirect(url_for('login'))
 	return render_template('add-zen.html')
 
 @app.route('/myze')
 def myze():
-	loggedin()
+	if not session.get('logged_in'):
+		return redirect(url_for('login'))
 	# get users ID
 	userid = getUserId()
 	# get all users games
@@ -74,7 +72,8 @@ def myze():
 @app.route('/addze')
 @app.route('/addze/<int:gid>')	
 def addze(gid=None):
-	loggedin()
+	if not session.get('logged_in'):
+		return redirect(url_for('login'))
 	# deal with editting
 	# if gid not None, then load all data into an object and pass it
 	bigdata = None
