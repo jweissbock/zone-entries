@@ -57,6 +57,7 @@ $(document).ready(function() {
 	    };
 	})(jQuery);
 
+	// meant for saving exits
 	$("#SaveZentries").on('click', function() {
 		$.jGrowl('Trying to save...');
 

@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h2>Add Zone Entry</h2>
+  <form id="addZEN">
+  <dl>
+  	<dt>Game ID:</dt>
+  	<dd><select id="gameidyear" name="gameidyear"><option value="20122013">2012-2013</option>
+  							  <option value="20132014">2013-2014</option></select>
+  		<input id="gameid" name="gameid" type="text" /></dd>
+  	<dt>Team</dt>
+  	<dd><select id="team" name="team"><option value="H">Home</option><option value="A">Away</option></select></dd>
+  </dl>
+  <div style="text-align: center">
+  	<table id="zentries" style="margin: 0 auto;" border="0" >
+  		<tr>
+  			<td>&nbsp;</td>
+  			<td>Period</td>
+  			<td>Time</td>
+  			<td>Entry Type</td>
+  			<td>Player</td>
+  			<td>Controlled</td>
+  			<td>Strength</td>
+  			<td>&nbsp;</td>
+  		</tr>
+  		<tr>
+  			<td class="NewCell"><input type="button" id="NewRow" value="(+)" /></td>
+  			<td><select name="period"><option value=1>1</option><option value=2>2</option><option value=3>3</option></select></td>
+  			<td><input name="time" type=text /></td>
+  			<td><select name="entry">
+  					<option value="C">(C) Carry</option>
+  					<option value="D">(D) Dump</option>
+  					<option value="T">(T) Tip</option>
+  				</select></td>
+  			<td><input name="player" type=text /></td>
+  			<td><select name="controlled"><option value="Y">Yes</option><option value="N">No</option></select></td>
+  			<td><select name="strength">
+  					<option selected>5v5</option>
+  					<option>5v4</option>
+  					<option>5v3</option>
+  					<option>4v5</option>
+  					<option>4v4</option>
+  					<option>4v3</option>
+  					<option>3v5</option>
+  					<option>3v4</option>	
+  				</select></td>
+  			<td class="DeleteCell"><input type="button" class="deleteRow" value="Delete" /></td>
+  		</tr>
+  	</table>
+  	<p><input type="button" id="SaveZen" value="Save" /></p>
+  	</form>
+  </div>
+{% endblock %}

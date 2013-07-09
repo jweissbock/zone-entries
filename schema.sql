@@ -15,7 +15,8 @@ create table entries (
 	period integer not null,
 	time text not null,
 	etype text not null,
-	player text not null
+	player text not null,
+	controlled text not null
 );
 
 drop table if exists exits;

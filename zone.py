@@ -54,6 +54,11 @@ def index():
 def about():
 	return render_template('about.html')
 
+# zone entries
+@app.route('/addzen')
+def addzen():
+	return render_template('add-zen.html')
+
 @app.route('/myze')
 def myze():
 	loggedin()
