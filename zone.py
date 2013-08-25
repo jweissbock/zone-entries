@@ -1,4 +1,4 @@
-import sqlite3, re, hashlib, json
+import sqlite3, re, hashlib, json, os
 from flask import Flask, request, session, g, redirect, url_for, \
 	abort, render_template, flash
 from contextlib import closing
@@ -41,8 +41,29 @@ def getUserId():
 	return fetchd[0]
 
 # our main views
-@app.route('/')
+def allowed_file(filename):
+	ALLOWED_EXTENSIONS = set(['xls', 'xlsm', 'xlsx'])
+	return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+@app.route('/', methods=['GET', 'POST'])
 def index():
+	if request.method == 'POST':
+		file = request.files['file']
+		data = request.form['data']
+		if file and allowed_file(file.filename):
+			from werkzeug import secure_filename
+			filename = secure_filename(file.filename)
+			UPLOAD_FOLDER = 'uploads/'
+			fullpath = os.path.join(UPLOAD_FOLDER, filename)
+			print fullpath
+			file.save(fullpath)
+			# parse it here
+			os.remove(fullpath)
+			message = "Successfully uploaded"
+		else:
+			message = "Not a valid excel file"
+		flash(message)
+		return redirect(url_for('index'))
 	return render_template('index.html')
 
 @app.route('/about')

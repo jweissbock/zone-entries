@@ -4,12 +4,26 @@
 <p>Welcome to ZEN, your one stop shop for tracking, and managing zone entry data as well as allowing it to be used for further research.  Got problems you want to solve with Zone Entries/Exists, let me know and I can help you with the data and writing programs to query this database and external ones.  </p>
 
 {% if session.logged_in %}
+
+<h3>Upload data</h3> 
+<form action="{{ url_for('index') }}" method=post enctype=multipart/form-data>
+<p style="text-align: center">
+Entry: <input type="radio" value="1" name="data" /> Exit: <input type="radio" value="2" name="data" checked /> <input type=file name=file>
+<input type="submit" value="upload" />
+</p>
+</form>
+
 <ul>
-	<li><a href="{{ url_for('addzen') }}">Add Zone Entry</a></li>
+	<li><a href="{{ url_for('index') }}">Add Zone Entry</a></li>
 	<li>My Zone Entries</li>
-	<li><a href="{{ url_for('addze') }}">Add Zone Exits</a></li>
-    <li><a href="{{ url_for('myze') }}">My Zone Exits</a></li>
+	<li><a href="{{ url_for('index') }}">Add Zone Exits</a></li>
+    <li><a href="{{ url_for('index') }}">My Zone Exits</a></li>
 </ul>
+
+{% else %}
+
+<h2>Please login to manage your zone data.</h2>
+
 {% endif %}
 
 <p>Zone Entry Nexus is for all forms of Zone Entry or exists.  Right now you can track Defensive Zone Exits but further additions will be added.  If you see any bugs, let me know, if you have any feedback, let me know.</p>
