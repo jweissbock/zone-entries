@@ -50,7 +50,20 @@ def index():
 	if request.method == 'POST':
 		file = request.files['file']
 		data = request.form['data']
-		if file and allowed_file(file.filename):
+		year = request.form['year']
+		gameid = request.form['gameid']
+		team = request.form['team']
+		if data not in ['1', '2']:
+			message = "Not a valid entry type"
+		elif year not in [str(x) for x in range(2013, 2014)]:
+			message = "Not a valid year"
+		elif len(gameid) not in [5,6] or not gameid.isdigit():
+			message = "game id is not valid."
+		elif int(gameid) < 20000 or int(gameid) >= 40000:
+			message = "Game id is not in the valid range"
+		elif team not in ['1', '2']:
+			message = "Not a valid team"
+		elif file and allowed_file(file.filename):
 			from werkzeug import secure_filename
 			filename = secure_filename(file.filename)
 			UPLOAD_FOLDER = 'uploads/'

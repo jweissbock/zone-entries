@@ -200,7 +200,7 @@ body {
  * Create dark grey header with a white logo
  */
 header {
-  background-color: #2B2B2B;
+  background-color: black; /** 282828 **/
   height: 35px;
   width: 100%;
   opacity: .9;
@@ -209,12 +209,12 @@ header {
 header h1.logo {
   margin: 0;
   font-size: 1.7em;
-  color: #fff;
+  color: #C11515;
   text-transform: uppercase;
   float: left;
 }
 header h1.logo:hover {
-  color: #fff;
+  color: #C11515;
   text-decoration: none;
 }
 /*
@@ -260,7 +260,7 @@ h3 {
   margin-left: 35px;
 }
 .menu li a {
-  color: #999;
+  color: #C11515;
   text-decoration: none;
 }
 
@@ -268,4 +268,8 @@ h3 {
 		border: 1px solid #aacbe2; }
 		
 .error { background: #f0d6d6; padding: 0.5em; }
+
+p.centre {
+  text-align: center;
+}
 

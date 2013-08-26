@@ -13,18 +13,18 @@
     <header>
       <div class="container">
         <h1 class="logo">Zone Entry Nexus</h1>
- 	<nav>
-	  <ul class="menu">
-	    <li><a href="{{ url_for('index') }}">Home</a></li>
-	    <li><a href="{{ url_for('about') }}">About</a></li>
-      {% if not session.logged_in %}
-        <li><a href="{{ url_for('login') }}">Login</a></li>
-        <li><a href="{{ url_for('register') }}">Register</a></li>
-      {% else %}
-        <li><a href="{{ url_for('logout') }}">Logout</a></li>
-      {% endif %}
-	  </ul>
-	</nav>
+       	<nav>
+      	  <ul class="menu">
+      	    <li><a href="{{ url_for('index') }}">Home</a></li>
+      	    <li><a href="{{ url_for('about') }}">About</a></li>
+            {% if not session.logged_in %}
+              <li><a href="{{ url_for('login') }}">Login</a></li>
+              <li><a href="{{ url_for('register') }}">Register</a></li>
+            {% else %}
+              <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% endif %}
+      	  </ul>
+      	</nav>
       </div>
      </header>
      {% for message in get_flashed_messages() %}

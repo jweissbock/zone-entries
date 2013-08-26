@@ -3,12 +3,17 @@
 <h2>Zone Entry Nexus</h2>
 <p>Welcome to ZEN, your one stop shop for tracking, and managing zone entry data as well as allowing it to be used for further research.  Got problems you want to solve with Zone Entries/Exists, let me know and I can help you with the data and writing programs to query this database and external ones.  </p>
 
+<p class="centre">Download the <a href="{{ url_for('static', filename='templates/Zone Exit Template.xls') }}">Exit Template</a> here</p>
+
 {% if session.logged_in %}
 
 <h3>Upload data</h3> 
 <form action="{{ url_for('index') }}" method=post enctype=multipart/form-data>
-<p style="text-align: center">
-Entry: <input type="radio" value="1" name="data" /> Exit: <input type="radio" value="2" name="data" checked /> <input type=file name=file>
+<p class="centre">
+Year: <select name="year"><option value="2013">2013-2014</option></select>
+Game ID: <input type="text" maxlength="6" value="20001" name="gameid" />
+Team: <select name="team"><option value="1">Home</option><option value="2">Away</option></select> <br />
+Entry: <input type="radio" value="1" name="data" disabled /> Exit: <input type="radio" value="2" name="data" checked /> <input type=file name=file>
 <input type="submit" value="upload" />
 </p>
 </form>
