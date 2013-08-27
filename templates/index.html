@@ -10,7 +10,7 @@
 <h3>Upload data</h3> 
 <form action="{{ url_for('index') }}" method=post enctype=multipart/form-data>
 <p class="centre">
-Year: <select name="year"><option value="2013">2013-2014</option></select>
+Year: <select name="year"><option value="20132014">2013-2014</option></select>
 Game ID: <input type="text" maxlength="6" value="20001" name="gameid" />
 Team: <select name="team"><option value="1">Home</option><option value="2">Away</option></select> <br />
 Entry: <input type="radio" value="1" name="data" disabled /> Exit: <input type="radio" value="2" name="data" checked /> <input type=file name=file>

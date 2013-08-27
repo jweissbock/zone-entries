@@ -1,4 +1,4 @@
-import sqlite3, re, hashlib, json, os
+import sqlite3, re, hashlib, json, os, xlrd
 from flask import Flask, request, session, g, redirect, url_for, \
 	abort, render_template, flash
 from contextlib import closing
@@ -45,6 +45,104 @@ def allowed_file(filename):
 	ALLOWED_EXTENSIONS = set(['xls', 'xlsm', 'xlsx'])
 	return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+def parseExits(fileName=None, gid=None, team=None):
+	# open file
+	workbook = xlrd.open_workbook(fileName)
+
+	sheet = workbook.sheet_by_index(0)
+
+	errors = False
+	message = ""
+	toInsert = []
+
+	# go through each row
+	for row in range(1,sheet.nrows):
+		rowData = sheet.row_values(row)
+		period = rowData[0]
+		carry = rowData[2]
+		player = rowData[3]
+		# parse all four colums
+
+		# Check if player is a digit
+		try:
+			player = int(float(player))
+		except: 
+			errors = True
+			message += "Row %s, invalid player, %s is not a digit.\n" % (row, str(player))
+
+		# check carry
+		if carry.upper() not in ['C', 'P', 'CH', 'FC', 'FP', 'CT', 'PT', 'X', 'I', 'T']:
+			errors = True
+			message += "Row %s: %s is not a valid carry.\n" % (row, carry)
+
+		# check period
+		if period == 'OT': period = 4
+		if period not in [1,2,3,4]: 
+			errors = True
+			message += "Row %s, %s is not a valid period.\n" % (row, period)
+		else:
+			try: 
+				period = int(period)
+			except: 
+				errors = True
+				message += "Row %s, %s is not a valid period.\n" % (row, period)
+
+		# time
+		try:
+			time = xlrd.xldate_as_tuple(rowData[1],0)
+		except:
+			errors = True
+			message += "Time Remaining: %s in row %s is not a valid time." % (rowData[1], row)
+			continue
+
+		try:
+			minute = int(time[3])
+			second = int(time[4])
+		except:
+			errors = True
+			message += "Time Remaining: %s:%s in row %s is not a valid time." % (time[3], str(time[4]).zfill(2), row)
+		else:
+			terrors = False
+			if minute not in range(0,21):
+				terrors = True
+			if second not in range(0,61):
+				terrors = True
+			if terrors == True:
+				errors = True
+				message += "Time Remaining: %s:%s in row %s is not a valid time." % (time[3], str(time[4]).zfill(2), row)
+
+		time = minute * 60 + second
+		toInsert.append([period, time, carry, player])
+
+
+	# are there error message?  Yes?  output them
+	if errors == True:
+		return (errors, message)
+
+	# no?  ok, insert
+	cur = g.db.execute('SELECT id FROM users WHERE email=?', [session.get('logged_in')])
+	fetchd = cur.fetchone()
+	if fetchd is None:
+		return (True, 'Something has gone wrong - you don\'t exist')
+	userid = fetchd[0]
+	print gid
+	print userid
+	print team
+	try:
+		# delete all entries for this game for this user
+		g.db.execute('DELETE FROM exits WHERE gameid = ? and tracker = ? and team = ?', [gid, userid, team])
+		g.db.commit()
+		# loop through entries again
+		for ze in toInsert:
+			print ze
+			# save each item
+			g.db.execute('INSERT INTO exits (gameid, tracker, team, period, time, exittype, player,pressure,strength) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+							[gid, userid, team, ze[0], ze[1], ze[2], ze[3], -1, -1])
+			g.db.commit()
+	except Exception,e:
+		return (True, 'Something went wrong with saving on the server side. %s  Please contact Josh.' % (str(e)))
+	return (False, "All is good!")
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
 	if request.method == 'POST':
@@ -55,24 +153,24 @@ def index():
 		team = request.form['team']
 		if data not in ['1', '2']:
 			message = "Not a valid entry type"
-		elif year not in [str(x) for x in range(2013, 2014)]:
+		elif year not in [str(x)+str(x+1) for x in range(2013, 2014)]:
 			message = "Not a valid year"
-		elif len(gameid) not in [5,6] or not gameid.isdigit():
+		elif len(gameid) not in [5] or not gameid.isdigit():
 			message = "game id is not valid."
 		elif int(gameid) < 20000 or int(gameid) >= 40000:
 			message = "Game id is not in the valid range"
 		elif team not in ['1', '2']:
 			message = "Not a valid team"
 		elif file and allowed_file(file.filename):
+			gid = str(year) + gameid
 			from werkzeug import secure_filename
 			filename = secure_filename(file.filename)
 			UPLOAD_FOLDER = 'uploads/'
 			fullpath = os.path.join(UPLOAD_FOLDER, filename)
-			print fullpath
 			file.save(fullpath)
 			# parse it here
+			message = parseExits(fullpath, gid, team)[1]
 			os.remove(fullpath)
-			message = "Successfully uploaded"
 		else:
 			message = "Not a valid excel file"
 		flash(message)
