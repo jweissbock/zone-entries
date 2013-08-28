@@ -3,8 +3,10 @@ from flask import Flask, request, session, g, redirect, url_for, \
 	abort, render_template, flash
 from contextlib import closing
 
+pwd = ""
 # configuration info
-DATABASE = 'zone.db'
+DATABASE = pwd+'zone.db'
+UPLOAD_FOLDER = pwd+'uploads/'
 DEBUG = True
 SECRET_KEY = 'I DONT KNOW WHAT IM DOING'
 USERNAME = 'admin'
@@ -165,8 +167,7 @@ def index():
 			gid = str(year) + gameid
 			from werkzeug import secure_filename
 			filename = secure_filename(file.filename)
-			UPLOAD_FOLDER = 'uploads/'
-			fullpath = os.path.join(UPLOAD_FOLDER, filename)
+			fullpath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 			file.save(fullpath)
 			# parse it here
 			message = parseExits(fullpath, gid, team)[1]
@@ -269,13 +270,6 @@ def saveze():
 			response['message'] = 'ZE %s does not have a valid Player' % (loop)
 			return json.dumps(response)
 		# check if stength is dvd
-		elif len(ze['strength']) != 3:
-			response['message'] = 'ZE %s does not have a valid strength' % (loop)
-			return json.dumps(response)
-		# check if pressure Y or N
-		elif ze['pressure'] not in ['Y', 'N']:
-			response['message'] = 'ZE %s does not have a valid pressure' % (loop)
-			return json.dumps(response)
 		loop += 1
 	# get user id from session
 	cur = g.db.execute('SELECT id FROM users WHERE email=?', [session.get('logged_in')])
@@ -290,12 +284,14 @@ def saveze():
 		g.db.commit()
 		# loop through entries again
 		for ze in zentries:
+			l = ze['time'].split(":")
+			ze['time'] = int(l[0])*60 + int(l[1])
 			# save each item
-			g.db.execute('INSERT INTO exits (gameid, tracker, team, period, time, exittype, player, pressure, strength) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-							[gid, userid, team, ze['period'], ze['time'], ze['exit'], ze['player'], ze['pressure'], ze['strength']])
+			g.db.execute('INSERT INTO exits (gameid, tracker, team, period, time, exittype, player, strength, pressure) VALUES (?, ?, ?, ?, ?, ?, ?,?,?)',
+							[gid, userid, team, ze['period'], ze['time'], ze['exit'], ze['player'], -1, -1])
 			g.db.commit()
-	except:
-		response['message'] = 'Something went wrong with saving on the server side.  Please contact Josh.'
+	except Exception as e:
+		response['message'] = 'Something went wrong with saving on the server side.  Please contact Josh. '+str(e)
 		return json.dumps(response)
 	# response
 	response['success'] = True

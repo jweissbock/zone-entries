@@ -19,10 +19,10 @@ Entry: <input type="radio" value="1" name="data" disabled /> Exit: <input type="
 </form>
 
 <ul>
-	<li><a href="{{ url_for('index') }}">Add Zone Entry</a></li>
-	<li>My Zone Entries</li>
-	<li><a href="{{ url_for('index') }}">Add Zone Exits</a></li>
-    <li><a href="{{ url_for('index') }}">My Zone Exits</a></li>
+	<li><a href="{{ url_for('addze') }}">Add Zone Entry</a></li>
+	<li><a href="{{ url_for('myze') }}">My Zone Entries</a></li>
+	<li>Add Zone Exits</li>
+    <li>My Zone Exits/li>
 </ul>
 
 {% else %}

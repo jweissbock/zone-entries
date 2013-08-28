@@ -2,6 +2,14 @@
 {% block content %}
 {% if data != None %}
 	<script type="text/javascript">
+  function secondstominutes(secs) {
+    var mins = Math.floor(secs / 60);
+    secs = secs % 60;
+
+    return (mins < 10 ? "0" + mins : mins) 
+          + ":"
+          + (secs < 10 ? "0" + secs : secs);
+  }
 	$(window).load(function(){
 		var gameid = null;
 		var team = null;
@@ -9,17 +17,13 @@
 		// get last row
 		var row = $("#zentries tr:last");
 		// lastrow.period = 4
-		row.find("select[name=period]").val({{ d[4] }});
+		row.find("select[name=period]").val('{{ d[4] }}');
 		// lastrow.time = 5
-		row.find("input[name=time]").val('{{ d[5] }}');
+		row.find("input[name=time]").val(secondstominutes('{{ d[5] }}'));
 		// lastrow.exit = 6
 		row.find("select[name=exit]").val('{{ d[6] }}')
 		// lastrow.player = 7
 		row.find("input[name=player]").val('{{ d[7] }}');
-		// lastrow.strength = 9
-		row.find("select[name=strength]").val('{{ d[9] }}')
-		// lastrow.pressure = 8
-		row.find("select[name=pressure]").val('{{ d[8] }}')
 		// save other variables
 		gameid = {{ d[1] }};
 		team = '{{ d[3] }}';
@@ -34,6 +38,7 @@
 		$("#gameid").val(gameid);
 		// select the house
 		$("#team").val(team);
+    $(".DeleteCell:last").click();
 	});
 	</script>
 {% endif %}
@@ -55,8 +60,6 @@
   			<td>Time</td>
   			<td>Exit Type</td>
   			<td>Player</td>
-  			<td>Pressure</td>
-  			<td>Strength</td>
   			<td>&nbsp;</td>
   		</tr>
   		<tr>
@@ -76,17 +79,6 @@
   					<option value="X">(X) Other</option>
   				</select></td>
   			<td><input name="player" type=text /></td>
-  			<td><select name="pressure"><option value="Y">Yes</option><option value="N">No</option></select></td>
-  			<td><select name="strength">
-  					<option selected>5v5</option>
-  					<option>5v4</option>
-  					<option>5v3</option>
-  					<option>4v5</option>
-  					<option>4v4</option>
-  					<option>4v3</option>
-  					<option>3v5</option>
-  					<option>3v4</option>	
-  				</select></td>
   			<td class="DeleteCell"><input type="button" class="deleteRow" value="Delete" /></td>
   		</tr>
   	</table>
