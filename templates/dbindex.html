@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+  <h2>ZEN Database</h2>
+  <p>Search the database to get data on Zone Exits and Entries already listed.</p>
+
+<form action="{{ url_for('db:index') }}" method=post enctype=multipart/form-data>
+<p class="centre">
+Year: <select name="year"><option value="20132014">2013-2014</option></select>
+Game ID: <input type="text" maxlength="6" value="20001" name="gameid" />
+<input type="submit" value="upload" />
+</p>
+</form>
+
+  <h3>Recently Added</h3>
+  {% if games is not none %}
+  <p>These are the recently added games</p>
+  <ul>
+  	{% for g in games %}
+  		<li><a href="{{ url_for('db:view', gameid=g) }}">{{ g }}</a></li>
+  	{% endfor %}
+  </ul>
+  {% else %}
+  <p>No recent games</p>
+  {% endif %}
+  
+{% endblock %}

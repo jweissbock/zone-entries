@@ -1,0 +1,73 @@
+<style type="text/css">
+td {
+    border: 1px solid black;
+}
+.error {
+    color: red;
+}
+</style>
+
+<p>Individual Data | On Ice Data</p>
+
+{% if error %}
+<p class="error">{{ error }}</p>
+{% endif %}
+
+<p><strong>Home Team</strong></p>
+
+<table>
+  <tr>
+    <td>#</td>
+    <td>Name</td>
+    <td># of exits</td>
+    <td># Failed</td>
+    <td># Successful</td> 
+    <td># w/ Possession</td>
+    <td>% w/ Possession</td>
+    <td>% of posession attempts when on ice</td>
+  </tr>
+
+ {% for row in data %}
+<tr>
+    <td>{{ row[0] }}</td>
+    <td>{{ row[1] }}</td>
+    <td>{{ row[2] }}</td>
+    <td>{{ row[3] }}</td>
+    <td>{{ row[4] }}</td>
+    <td>{{ row[5] }}</td>
+    <td>{{ row[6] }}</td>
+    <td>{{ row[7] }}</td>
+</tr>
+ {% endfor %}   
+</table>
+
+<p><strong>Away Team</strong></p>
+
+
+{% if error2 %}
+<p class="error">{{ error2 }}</p>
+{% endif %}
+<table>
+  <tr>
+    <td>#</td>
+    <td>Name</td>
+    <td># of exits</td>
+    <td># Failed</td>
+    <td># Successful</td> 
+    <td># w/ Possession</td>
+    <td>% w/ Possession</td>
+    <td>% of posession attempts when on ice</td>
+  </tr>
+ {% for row in data2 %}
+<tr>
+    <td>{{ row[0] }}</td>
+    <td>{{ row[1] }}</td>
+    <td>{{ row[2] }}</td>
+    <td>{{ row[3] }}</td>
+    <td>{{ row[4] }}</td>
+    <td>{{ row[5] }}</td>
+    <td>{{ row[6] }}</td>
+    <td>{{ row[7] }}</td>
+</tr>
+ {% endfor %} 
+  </table>

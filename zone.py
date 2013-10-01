@@ -170,6 +170,7 @@ def index():
 			fullpath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 			file.save(fullpath)
 			# parse it here
+			# delete old from exits for this game + user
 			message = parseExits(fullpath, gid, team)[1]
 			os.remove(fullpath)
 		else:
@@ -177,6 +178,9 @@ def index():
 		flash(message)
 		return redirect(url_for('index'))
 	return render_template('index.html')
+
+from views.db import db
+db.register(app)
 
 @app.route('/about')
 def about():

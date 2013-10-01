@@ -10,9 +10,10 @@
           + ":"
           + (secs < 10 ? "0" + secs : secs);
   }
-	$(window).load(function(){
+	$(document).load(function(){
 		var gameid = null;
 		var team = null;
+    alert('loading');
 	{% for d in data %}
 		// get last row
 		var row = $("#zentries tr:last");
@@ -64,7 +65,7 @@
   		</tr>
   		<tr>
   			<td class="NewCell"><input type="button" id="NewRow" value="(+)" /></td>
-  			<td><select name="period"><option value=1>1</option><option value=2>2</option><option value=3>3</option></select></td>
+  			<td><select name="period"><option value=1>1</option><option value=2>2</option><option value=3>3</option><option value=4>OT</option></select></td>
   			<td><input name="time" type=text /></td>
   			<td><select name="exit">
   					<option value="C">(C) Carry</option>
