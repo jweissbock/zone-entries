@@ -52,7 +52,7 @@ class db(FlaskView):
 		# away team
 		cur = g.db.execute("SELECT * FROM exits WHERE gameid = ? AND (team = '2' OR team = 'A') ORDER BY player", [gameid])
 		allData = cur.fetchall()
-		error = None
+		error2 = None
 		if allData == []:
 			error2 = "Away Team does not have data."
 		mydata = {}
