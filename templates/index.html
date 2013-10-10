@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>Zone Entry Nexus</h2>
-<p>Welcome to ZEN, your one stop shop for tracking, and managing zone entry data as well as allowing it to be used for further research.  Got problems you want to solve with Zone Entries/Exists, let me know and I can help you with the data and writing programs to query this database and external ones.  </p>
+<h2>Zone Entries Nexus</h2>
+<p>Welcome to ZEN, your one stop shop for tracking, and managing zone entry data as well as allowing it to be used for further research. Zone Entries Nexus is for all forms of Zone Entry or Exits.  Right now you can track Defensive Zone Exits but further additions will be added.  </p>
+
+<p>What are Zone Exits?  Read <a href="http://nhlnumbers.com/2013/8/14/zone-exits-an-introduction">this</a> article, or <a href="http://nhlnumbers.com/2013/2/20/zone-entries-and-the-sloan-sports-analytics-conference">this paper</a>.</p>
+
+<p>"If you are interested in learning more about zone exits or would like to track zone exits in the future, please contact Pierce Cunneen via email (pcunneen19@gmail.com) or via twitter <a href="http://twitter.com/pcunneen19">@pcunneen19</a>.</p>
 
 <p class="centre">Download the <a href="{{ url_for('static', filename='templates/Zone Exit Template.xls') }}">Exit Template</a> here</p>
 
@@ -11,7 +15,7 @@
 <form action="{{ url_for('index') }}" method=post enctype=multipart/form-data>
 <p class="centre">
 Year: <select name="year"><option value="20132014">2013-2014</option></select>
-Game ID: <input type="text" maxlength="6" value="20001" name="gameid" />
+Game ID: <input type="text" maxlength="6" value="2xxxx" name="gameid" />
 Team: <select name="team"><option value="1">Home</option><option value="2">Away</option></select> <br />
 Entry: <input type="radio" value="1" name="data" disabled /> Exit: <input type="radio" value="2" name="data" checked /> <input type=file name=file>
 <input type="submit" value="upload" />
@@ -31,9 +35,9 @@ Entry: <input type="radio" value="1" name="data" disabled /> Exit: <input type="
 
 {% endif %}
 
-<p>Zone Entry Nexus is for all forms of Zone Entry or exists.  Right now you can track Defensive Zone Exits but further additions will be added.  If you see any bugs, let me know, if you have any feedback, let me know.</p>
+<p>Got problems you want to solve with Zone Entries/Exists, let me know and I can help you with the data and writing programs to query this database and external ones.  If you see any bugs, let me know, if you have any feedback, let me know.</p>
 
-<p>Want to learn more about Zone Entry and Exists?  Check <a href="http://nhlnumbers.com/2013/2/20/zone-entries-and-the-sloan-sports-analytics-conference">this paper</a> out.</p>	
+<p>Any bugs or issues send them to Pierce or post them <a href="https://github.com/sareon/zone-entries/issues">here</a>.  Make sure to tell us where the error is, what the error is, how to replicate it, and what the expected outcome is.</p>
 
 <p>Also Check out the <a href="http://sareon.pythonanywhere.com/">Hockey Scoring Chances app</a>.</p> 
 {% endblock %}

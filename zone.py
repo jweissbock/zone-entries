@@ -3,6 +3,8 @@ from flask import Flask, request, session, g, redirect, url_for, \
 	abort, render_template, flash
 from contextlib import closing
 
+import helpers
+
 pwd = ""
 # configuration info
 DATABASE = pwd+'zone.db'
@@ -61,7 +63,7 @@ def parseExits(fileName=None, gid=None, team=None):
 	for row in range(1,sheet.nrows):
 		rowData = sheet.row_values(row)
 		period = rowData[0]
-		carry = rowData[2]
+		carry = rowData[2].upper()
 		player = rowData[3]
 		# parse all four colums
 
@@ -73,7 +75,7 @@ def parseExits(fileName=None, gid=None, team=None):
 			message += "Row %s, invalid player, %s is not a digit.\n" % (row, str(player))
 
 		# check carry
-		if carry.upper() not in ['C', 'P', 'CH', 'FC', 'FP', 'CT', 'PT', 'X', 'I', 'T']:
+		if carry not in ['C', 'P', 'CH', 'FC', 'FP', 'CT', 'PT', 'X', 'I', 'T']:
 			errors = True
 			message += "Row %s: %s is not a valid carry.\n" % (row, carry)
 
@@ -182,21 +184,22 @@ def index():
 from views.db import db
 db.register(app)
 
+from views.admin import admin
+admin.register(app)
+
 @app.route('/about')
 def about():
 	return render_template('about.html')
 
 # zone entries
 @app.route('/addzen')
+@helpers.login_required
 def addzen():
-	if not session.get('logged_in'):
-		return redirect(url_for('login'))
 	return render_template('add-zen.html')
 
 @app.route('/myze')
+@helpers.login_required
 def myze():
-	if not session.get('logged_in'):
-		return redirect(url_for('login'))
 	# get users ID
 	userid = getUserId()
 	# get all users games
@@ -208,9 +211,8 @@ def myze():
 # main page for adding zone entries
 @app.route('/addze')
 @app.route('/addze/<int:gid>')	
+@helpers.login_required
 def addze(gid=None):
-	if not session.get('logged_in'):
-		return redirect(url_for('login'))
 	# deal with editting
 	# if gid not None, then load all data into an object and pass it
 	bigdata = None

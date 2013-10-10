@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Delete game data</h2>
+
+<p>Click on a game to delete its data.  <b>Warning, this is not reversable.</b></p>
+
+<ul>
+{% for g in data %}
+<li><a href="{{ url_for('admin:deletedata', gameid=g[1]) }}" onclick="return confirm('Are you sure?')">{{ g[0] }}</a></la>
+{% endfor %}
+</ul>
+
+{% endblock %}

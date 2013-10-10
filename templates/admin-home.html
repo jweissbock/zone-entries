@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Admin Panel</h2>
+
+<ul>
+<a href="{{ url_for('admin:deletegame') }}">Delete Game Data</a>
+</ul>
+
+{% endblock %}
