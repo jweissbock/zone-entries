@@ -95,10 +95,15 @@ def parseExits(fileName=None, gid=None, team=None):
 		try:
 			time = xlrd.xldate_as_tuple(rowData[1],0)
 		except:
-			errors = True
-			message += "Time Remaining: %s in row %s is not a valid time." % (rowData[1], row)
-			continue
+			if re.compile('^(\d)+:\d\d$').match(rowData[1]):
+				time = rowData[1]
+				if len(time) == 4: time = "0"+time
+			else:
+				errors = True
+				message += "Time Remaining: %s in row %s is not a valid time." % (rowData[1], row)
+				continue
 
+		print time
 		try:
 			minute = int(time[3])
 			second = int(time[4])
@@ -129,16 +134,12 @@ def parseExits(fileName=None, gid=None, team=None):
 	if fetchd is None:
 		return (True, 'Something has gone wrong - you don\'t exist')
 	userid = fetchd[0]
-	print gid
-	print userid
-	print team
 	try:
 		# delete all entries for this game for this user
 		g.db.execute('DELETE FROM exits WHERE gameid = ? and tracker = ? and team = ?', [gid, userid, team])
 		g.db.commit()
 		# loop through entries again
 		for ze in toInsert:
-			print ze
 			# save each item
 			g.db.execute('INSERT INTO exits (gameid, tracker, team, period, time, exittype, player,pressure,strength) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
 							[gid, userid, team, ze[0], ze[1], ze[2], ze[3], -1, -1])
