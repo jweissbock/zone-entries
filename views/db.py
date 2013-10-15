@@ -17,87 +17,81 @@ class db(FlaskView):
 		# chip, FP, FC, or other (x) without posession
 			# but still successful
 		# unsuccessful: Icing, pass turn over, carry turnover, turnover
+	# if we are logged in we want to get that users stats
 	@route('/<int:gameid>/')	
 	def view(self, gameid):
-		# if you're logged in get your stats
-		cur = g.db.execute("SELECT * FROM exits WHERE gameid = ? AND (team = '1' OR team = 'H') ORDER BY player", [gameid])
-		allData = cur.fetchall()
-		error = None
-		if allData == []:
-			error = "Home Team does not have data."
-		mydata = {}
-		total = 0
-		default = [0]*8
 		# load user names
 		oGameID = str(gameid)[0:4]+"0"+str(gameid)[-5:]
 		url = 'http://sareon.pythonanywhere.com/toi/roster/'+oGameID
-		players = json.loads(requests.get(url).text)
+		# try-catch it, if it is not json
+		try:
+			players = json.loads(requests.get(url).text)
+		except:
+			players = {'h' : '', 'v' : ''}
 
-		# calculate stats
-		for d in allData:
-			total += 1
-			playerNum = d[7]
-			exittype = d[6]
-			if playerNum not in mydata:
-				mydata[playerNum] = list(default)
-				if str(playerNum) not in players['h']:
-					mydata[playerNum][0] = '<Invalid PNum>'
-				else:
-					mydata[playerNum][0] = players['h'][str(playerNum)]
-			mydata[playerNum][1] += 1
-			if exittype in ['P', 'C']:
-				mydata[playerNum][4] += 1
-			if exittype in ['P', 'C', 'CH', 'FC', 'FP', 'X']:
-				mydata[playerNum][3] += 1
-			if exittype in ['I', 'T', 'CT', 'PT']:
-				mydata[playerNum][2] += 1	
-		# dictionary to list
-		data = []
-		for i in mydata:
-			myrow = [i]+mydata[i]
-			myrow[6] = float(myrow[5]) / myrow[2]	
-			myrow[6] = math.ceil(myrow[6] * 1000.0) / 1000.0
-			myrow[8] = float(myrow[4]) / myrow[2]	
-			myrow[8] = math.ceil(myrow[8] * 1000.0) / 1000.0
-			myrow[7] = '-'
-			data.append(myrow)		
+		# data to be pre-loaded once
+		default = [0]*8
+		error, error2 = None, None
+		data, data2 = [], []
+		
+		# loop through the chances
+		for location in ['H', 'A']:
+			mydata = {}
+			total = 0
+			teamNum = 2
+			teamCode = 'A'
+			teamPCode = 'v'
+			tempError = None
+			tempData = []
 
-		# away team
-		cur = g.db.execute("SELECT * FROM exits WHERE gameid = ? AND (team = '2' OR team = 'A') ORDER BY player", [gameid])
-		allData = cur.fetchall()
-		error2 = None
-		if allData == []:
-			error2 = "Away Team does not have data."
-		mydata = {}
-		total = 0
-		default = [0]*7
-		# calculate stats
-		for d in allData:
-			total += 1
-			playerNum = d[7]
-			exittype = d[6]
-			if playerNum not in mydata:
-				mydata[playerNum] = list(default)
-				if str(playerNum) not in players['v']:
-					mydata[playerNum][0] = '<Invalid PNum>'
-				else:
-					mydata[playerNum][0] = players['v'][str(playerNum)]
-			mydata[playerNum][1] += 1
-			if exittype in ['P', 'C']:
-				mydata[playerNum][4] += 1
-			if exittype in ['P', 'C', 'CH', 'FC', 'FP', 'X']:
-				mydata[playerNum][3] += 1
-			if exittype in ['I', 'T', 'CT', 'PT']:
-				mydata[playerNum][2] += 1	
-		# dictionary to list
-		data2 = []
-		for i in mydata:
-			myrow = [i]+mydata[i]
-			myrow[6] = float(myrow[5]) / myrow[2]	
-			myrow[6] = math.ceil(myrow[6] * 1000.0) / 1000.0
-			myrow[8] = float(myrow[4]) / myrow[2]	
-			myrow[8] = math.ceil(myrow[8] * 1000.0) / 1000.0
-			myrow[7] = '-'
-			data2.append(myrow)	
+			# are we doing home or away stats?
+			if location == 'H':
+				teamNum = 1
+				teamCode = 'H'	
+				teamPCode = 'h'
+
+			cur = g.db.execute("SELECT * FROM exits WHERE gameid = ? AND (team = ? OR team = ?) ORDER BY player", [gameid, teamNum, teamCode])
+			allData = cur.fetchall()
+			if allData == []:
+				tempError = "Team does not have data."
+
+
+			# calculate stats
+			for d in allData:
+				total += 1
+				playerNum = d[7]
+				exittype = d[6]
+				if playerNum not in mydata:
+					mydata[playerNum] = list(default)
+					if str(playerNum) not in players[teamPCode]:
+						mydata[playerNum][0] = '<Invalid Plr#>'
+					else:
+						mydata[playerNum][0] = players[teamPCode][str(playerNum)]
+				mydata[playerNum][1] += 1
+				if exittype in ['P', 'C']:
+					mydata[playerNum][4] += 1
+				if exittype in ['P', 'C', 'CH', 'FC', 'FP', 'X']:
+					mydata[playerNum][3] += 1
+				if exittype in ['I', 'T', 'CT', 'PT']:
+					mydata[playerNum][2] += 1	
+
+			# dictionary to list
+			for i in mydata:
+				myrow = [i]+mydata[i]
+				myrow[6] = float(myrow[5]) / myrow[2]	
+				myrow[6] = math.ceil(myrow[6] * 1000.0) / 1000.0
+				myrow[8] = float(myrow[4]) / myrow[2]	
+				myrow[8] = math.ceil(myrow[8] * 1000.0) / 1000.0
+				myrow[7] = '-'
+				tempData.append(myrow)		
+
+			# assign the variables now
+			if location == 'H':
+				error = tempError
+				data = tempData
+			else:
+				error2 = tempError
+				data2 = tempData
+
 		return render_template('dbview.html', data=data, error=error,
 								error2=error2, data2=data2)
