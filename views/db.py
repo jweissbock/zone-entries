@@ -2,6 +2,7 @@ from __future__ import with_statement
 from flask import Flask, render_template, request, session, g, redirect, url_for, \
 	 abort, flash
 from flask.ext.classy import FlaskView, route
+import requests, json
 
 class db(FlaskView):
 	def index(self):
@@ -26,7 +27,11 @@ class db(FlaskView):
 			error = "Home Team does not have data."
 		mydata = {}
 		total = 0
-		default = ['<P. Holder>']+[0]*6
+		default = [0]*7
+		# load user names
+		oGameID = str(gameid)[0:4]+"0"+str(gameid)[-5:]
+		url = 'http://sareon.pythonanywhere.com/toi/roster/'+oGameID
+		players = json.loads(requests.get(url).text)
 		# calculate stats
 		for d in allData:
 			total += 1
@@ -34,6 +39,10 @@ class db(FlaskView):
 			exittype = d[6]
 			if playerNum not in mydata:
 				mydata[playerNum] = list(default)
+				if str(playerNum) not in players['h']:
+					mydata[playerNum][0] = '<Invalid PNum>'
+				else:
+					mydata[playerNum][0] = players['h'][str(playerNum)]
 			mydata[playerNum][1] += 1
 			if exittype in ['P', 'C']:
 				mydata[playerNum][4] += 1
@@ -57,7 +66,7 @@ class db(FlaskView):
 			error2 = "Away Team does not have data."
 		mydata = {}
 		total = 0
-		default = ['<A. Holder>']+[0]*6
+		default = [0]*7
 		# calculate stats
 		for d in allData:
 			total += 1
@@ -65,6 +74,10 @@ class db(FlaskView):
 			exittype = d[6]
 			if playerNum not in mydata:
 				mydata[playerNum] = list(default)
+				if str(playerNum) not in players['v']:
+					mydata[playerNum][0] = '<Invalid PNum>'
+				else:
+					mydata[playerNum][0] = players['v'][str(playerNum)]
 			mydata[playerNum][1] += 1
 			if exittype in ['P', 'C']:
 				mydata[playerNum][4] += 1
