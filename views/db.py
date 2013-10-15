@@ -2,7 +2,7 @@ from __future__ import with_statement
 from flask import Flask, render_template, request, session, g, redirect, url_for, \
 	 abort, flash
 from flask.ext.classy import FlaskView, route
-import requests, json
+import requests, json, math
 
 class db(FlaskView):
 	def index(self):
@@ -27,11 +27,12 @@ class db(FlaskView):
 			error = "Home Team does not have data."
 		mydata = {}
 		total = 0
-		default = [0]*7
+		default = [0]*8
 		# load user names
 		oGameID = str(gameid)[0:4]+"0"+str(gameid)[-5:]
 		url = 'http://sareon.pythonanywhere.com/toi/roster/'+oGameID
 		players = json.loads(requests.get(url).text)
+
 		# calculate stats
 		for d in allData:
 			total += 1
@@ -55,7 +56,10 @@ class db(FlaskView):
 		for i in mydata:
 			myrow = [i]+mydata[i]
 			myrow[6] = float(myrow[5]) / myrow[2]	
-			myrow[-1] = '-'
+			myrow[6] = math.ceil(myrow[6] * 1000.0) / 1000.0
+			myrow[8] = float(myrow[4]) / myrow[2]	
+			myrow[8] = math.ceil(myrow[8] * 1000.0) / 1000.0
+			myrow[7] = '-'
 			data.append(myrow)		
 
 		# away team
@@ -90,7 +94,10 @@ class db(FlaskView):
 		for i in mydata:
 			myrow = [i]+mydata[i]
 			myrow[6] = float(myrow[5]) / myrow[2]	
-			myrow[-1] = '-'
+			myrow[6] = math.ceil(myrow[6] * 1000.0) / 1000.0
+			myrow[8] = float(myrow[4]) / myrow[2]	
+			myrow[8] = math.ceil(myrow[8] * 1000.0) / 1000.0
+			myrow[7] = '-'
 			data2.append(myrow)	
 		return render_template('dbview.html', data=data, error=error,
 								error2=error2, data2=data2)
