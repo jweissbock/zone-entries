@@ -6,7 +6,7 @@ import requests, json, math
 
 class db(FlaskView):
 	def index(self):
-		cur = g.db.execute(' SELECT gameid FROM exits GROUP BY gameid ORDER BY id LIMIT 100')
+		cur = g.db.execute(' SELECT gameid FROM exits GROUP BY gameid ORDER BY gameid DESC LIMIT 100')
 		bigdata = [row[0] for row in cur.fetchall()]
 		return render_template('dbindex.html', games=bigdata)
 
