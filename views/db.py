@@ -11,7 +11,14 @@ class db(FlaskView):
 		return render_template('dbindex.html', games=bigdata)
 
 	def post(self):
-		return "Thanks for searching!"
+		year = request.form['year']
+		gameid = request.form['gameid']
+		urlNumber = year + gameid
+		cur = g.db.execute('SELECT COUNT(*) FROM exits WHERE gameid = ?', [urlNumber])
+		if cur.fetchone()[0] == 0:
+			return "No data found for this game."
+		else:
+			return redirect(url_for('rosterView', gameid=urlNumber))
 
 	@route('/<int:gameid>/recache')
 	def recache(self, gameid):
