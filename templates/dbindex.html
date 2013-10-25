@@ -16,7 +16,7 @@ Game ID: <input type="text" maxlength="6" value="20001" name="gameid" />
   <p>These are the recently added games</p>
   <ul>
   	{% for g in games %}
-  		<li><a href="{{ url_for('db:view', gameid=g) }}">{{ g }}</a></li>
+  		<li><a href="{{ url_for('rosterView', gameid=g) }}">{{ g }}</a></li>
   	{% endfor %}
   </ul>
   {% else %}

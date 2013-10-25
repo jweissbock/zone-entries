@@ -3,7 +3,8 @@
 <h2>Admin Panel</h2>
 
 <ul>
-<a href="{{ url_for('admin:deletegame') }}">Delete Game Data</a>
+<li> <a href="{{ url_for('admin:deletegame') }}">Delete Game Data</a></li>
+<li> <a href="{{ url_for('admin:fixrosternames') }}">Fix Rosters: Missing Players Names</a></li>
 </ul>
 
 {% endblock %}

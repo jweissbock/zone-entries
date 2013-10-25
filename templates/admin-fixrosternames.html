@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Fix Roster Names</h2>
+
+<p>Click on a game to fix the names.  If the parser failed to properly cache all names and all of the player names for one team are showing up as invalid, this will force it to reparse.</p>
+
+<ul>
+{% for g in data %}
+<li><a href="{{ url_for('rosterRecache', gameid=g[1], fetch=True) }}">{{ g[0] }}</a></la>
+{% endfor %}
+</ul>
+
+{% endblock %}

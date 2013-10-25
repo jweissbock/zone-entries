@@ -7,14 +7,25 @@ import helpers
 
 class admin(FlaskView):
 	@helpers.admin_only
+	# need to make this private
+	def getAllGames(self):
+		cur = g.db.execute('SELECT gameid FROM exits GROUP BY gameid ORDER BY gameid DESC')
+		return [[str(x[0])[0:8]+" "+str(x[0])[8:], int(x[0])] for x in cur.fetchall()]
+
+	@helpers.admin_only
 	def index(self):
 		return render_template('admin-home.html')
+
+	@route('/fixrosternames')
+	@helpers.admin_only
+	def fixrosternames(self):
+		games = self.getAllGames()
+		return render_template('admin-fixrosternames.html', data=games)
 
 	@route('/deletegame')
 	@helpers.admin_only
 	def deletegame(self):
-		cur = g.db.execute('SELECT gameid FROM exits GROUP BY gameid ORDER BY gameid DESC')
-		games = [[str(x[0])[0:8]+" "+str(x[0])[8:], int(x[0])] for x in cur.fetchall()]
+		games = self.getAllGames()
 		return render_template('admin-deletegame.html', data=games)
 
 	@route('/deletegame/<int:gameid>')

@@ -13,16 +13,22 @@ class db(FlaskView):
 	def post(self):
 		return "Thanks for searching!"
 
-		# pass or carry, exit with posession
-		# chip, FP, FC, or other (x) without posession
-			# but still successful
-		# unsuccessful: Icing, pass turn over, carry turnover, turnover
-	# if we are logged in we want to get that users stats
-	@route('/<int:gameid>/')	
-	def view(self, gameid):
+	@route('/<int:gameid>/recache')
+	def recache(self, gameid):
+		return redirect(url_for('rosterRecache', gameid=gameid, fetch=True))
+
+	# pass or carry, exit with posession
+	# chip, FP, FC, or other (x) without posession
+		# but still successful
+	# unsuccessful: Icing, pass turn over, carry turnover, turnover
+	# if we are logged in we want to get that users stats	
+	@route('/<int:gameid>/', endpoint='rosterView')
+	@route('/<int:gameid>/<fetch>', endpoint='rosterRecache')
+	def view(self, gameid, fetch=None):
 		# load user names
 		oGameID = str(gameid)[0:4]+"0"+str(gameid)[-5:]
 		url = 'http://sareon.pythonanywhere.com/toi/roster/'+oGameID
+		url += "/true" if fetch == "True" else ""
 		# try-catch it, if it is not json
 		try:
 			players = json.loads(requests.get(url).text)
