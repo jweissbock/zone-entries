@@ -10,6 +10,7 @@ class db(FlaskView):
 		bigdata = [row[0] for row in cur.fetchall()]
 		return render_template('dbindex.html', games=bigdata)
 
+	# The search engine for the database
 	def post(self):
 		year = request.form['year']
 		gameid = request.form['gameid']
@@ -19,6 +20,52 @@ class db(FlaskView):
 			return "No data found for this game."
 		else:
 			return redirect(url_for('rosterView', gameid=urlNumber))
+
+	@route('/season')
+	def season(self, year="20132014", team="VAN"):
+		# this will be fancier later to select te year + team only games
+		cur = g.db.execute('SELECT * FROM exits')
+		allExits = cur.fetchall()
+		home = {}
+		away = {}
+		total = {}
+		for exit in allExits:
+			# set out variables
+			playerNum = exit[7]
+			exittype = exit[6].upper()
+			temp = home if int(exit[3]) == 1 else away
+			# format into output
+			default = [0]*7
+			if playerNum not in temp: temp[exit[7]] = default
+			# increment # of exits
+			temp[playerNum][0] += 1
+			# increment failed
+			if exittype in ['I', 'T', 'CT', 'PT']:
+				temp[playerNum][1] += 1	
+			if exittype in ['P', 'C']:
+				temp[playerNum][3] += 1
+			if exittype in ['P', 'C', 'CH', 'FC', 'FP', 'X']:
+				temp[playerNum][2] += 1	
+		# append two together, add if already in
+		total = home.copy()
+		for i in away:
+			if i not in home:
+				home[i] = away[i]
+			else:
+				home[i] = [x+y for x,y in zip(home[i], away[i])]
+		# reorder numbers?
+		# convert dictionary to lists
+		homeList = [[x]+y for x,y in zip(home.keys(), home.values())]
+		awayList = [[x]+y for x,y in zip(away.keys(), away.values())]
+		totalList = [[x]+y for x,y in zip(total.keys(), total.values())]
+		# calculate the percentages
+		for myList in [homeList, awayList, totalList]:
+			for row in myList:
+				row[5] = float(row[3]) / row[1]	
+				row[5] = math.ceil(row[5] * 1000.0) / 1000.0
+				row[6] = float(row[4]) / row[1]	
+				row[6] = math.ceil(row[6] * 1000.0) / 1000.0
+		return render_template('dbseason.html', data=homeList, data2=awayList, data3=totalList)
 
 	@route('/<int:gameid>/recache')
 	def recache(self, gameid):
