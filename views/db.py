@@ -48,16 +48,20 @@ class db(FlaskView):
 				temp[playerNum][2] += 1	
 		# append two together, add if already in
 		total = home.copy()
+		print away
 		for i in away:
 			if i not in home:
-				home[i] = away[i]
+				total[i] = away[i]
 			else:
-				home[i] = [x+y for x,y in zip(home[i], away[i])]
-		# reorder numbers?
+				total[i] = [x+y for x,y in zip(home[i], away[i])]
 		# convert dictionary to lists
 		homeList = [[x]+y for x,y in zip(home.keys(), home.values())]
 		awayList = [[x]+y for x,y in zip(away.keys(), away.values())]
 		totalList = [[x]+y for x,y in zip(total.keys(), total.values())]
+		# sort numerically
+		homeList = sorted(homeList, key=lambda x: int(x[0]))
+		awayList = sorted(awayList, key=lambda x: int(x[0]))
+		totalList = sorted(totalList, key=lambda x: int(x[0]))
 		# calculate the percentages
 		for myList in [homeList, awayList, totalList]:
 			for row in myList:
