@@ -5,7 +5,24 @@ td {
 .error {
     color: red;
 }
+a {
+    color: blue ;
+}
 </style>
+
+| {% for code in teamCodes %}
+    {% if code != curTeam %}
+        <a href="{{ url_for('dbSeasonTeam', team=code) }}">{{ code }}</a> 
+    {% else %}
+        {{ code }}
+    {% endif %} |
+{% endfor %}
+
+{% if error %}
+
+<p class="error">{{ error }}</p>
+
+{% else %}
 
 <p>Home Data | Away Data | Aggregate Data</p>
 
@@ -90,3 +107,5 @@ td {
 </tr>
  {% endfor %} 
   </table>
+
+{% endif %}

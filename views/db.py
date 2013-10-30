@@ -21,18 +21,45 @@ class db(FlaskView):
 		else:
 			return redirect(url_for('rosterView', gameid=urlNumber))
 
-	@route('/season')
+	@route('/season/', endpoint='dbSeasonIn')
+	@route('/season/<team>/', endpoint='dbSeasonTeam')
 	def season(self, year="20132014", team="VAN"):
-		# this will be fancier later to select te year + team only games
-		cur = g.db.execute('SELECT * FROM exits')
-		allExits = cur.fetchall()
+		# team codes
+		teamCodes = sorted(['PIT', 'PHI', 'OTT', 'WPG', 'CHI', 'LAK', 'BOS', 'NYR', 'TOR', 'MTL',
+					 		'NJD', 'NYI', 'TBL', 'WSH', 'FLA', 'CAR', 'STL', 'DET', 'CBJ', 'NSH', 
+					 		'DAL', 'PHX', 'MIN', 'COL', 'ANA', 'VAN', 'BUF', 'SJS', 'CGY', 'EDM'])	
+		error = None
+		team = team.upper()
+		# need code to make currently selected team not a link
+		if team not in teamCodes:
+			error = "Team is not a valid code"
+		# get all game ides and location for this team
+		cur = g.db.execute('SELECT gameid, location FROM gameList WHERE teamCode = ?', [team])
+		allGames = cur.fetchall()
+		# need to check if team has any games
+		if allGames == []:
+			error = "No games found for this team" # gonna cause mixed problems with last error
+
+		allExits = []
+		# for each of those games, get all exits, append to allExits
+		for game in allGames:
+			location = '1' if game[1] == 'h' else '2'
+			# 2013020002 -> 2013201420002
+			gID = str(game[0])[0:4] + str(int(str(game[0])[0:4])+1) + str(game[0])[-5:]
+			cur = g.db.execute('SELECT * FROM exits WHERE gameid = ? and team = ?', [gID, location])
+			thisData = cur.fetchall()
+			if thisData != []:
+				allExits += thisData
+		#cur = g.db.execute('SELECT * FROM exits')
+		#allExits = cur.fetchall()
 		home = {}
 		away = {}
 		total = {}
 		for exit in allExits:
+			if exit == []: continue
 			# set out variables
 			playerNum = exit[7]
-			exittype = exit[6].upper()
+			exittype = str(exit[6]).upper()
 			temp = home if int(exit[3]) == 1 else away
 			# format into output
 			default = [0]*7
@@ -48,7 +75,6 @@ class db(FlaskView):
 				temp[playerNum][2] += 1	
 		# append two together, add if already in
 		total = home.copy()
-		print away
 		for i in away:
 			if i not in home:
 				total[i] = away[i]
@@ -58,7 +84,8 @@ class db(FlaskView):
 		homeList = [[x]+y for x,y in zip(home.keys(), home.values())]
 		awayList = [[x]+y for x,y in zip(away.keys(), away.values())]
 		totalList = [[x]+y for x,y in zip(total.keys(), total.values())]
-		# sort numerically
+		# sort numerically 
+		#	should be combined with the stuff about
 		homeList = sorted(homeList, key=lambda x: int(x[0]))
 		awayList = sorted(awayList, key=lambda x: int(x[0]))
 		totalList = sorted(totalList, key=lambda x: int(x[0]))
@@ -69,7 +96,8 @@ class db(FlaskView):
 				row[5] = math.ceil(row[5] * 1000.0) / 1000.0
 				row[6] = float(row[4]) / row[1]	
 				row[6] = math.ceil(row[6] * 1000.0) / 1000.0
-		return render_template('dbseason.html', data=homeList, data2=awayList, data3=totalList)
+		return render_template('dbseason.html', data=homeList, data2=awayList, data3=totalList,
+								teamCodes=teamCodes, curTeam=team, error=error)
 
 	@route('/<int:gameid>/recache')
 	def recache(self, gameid):
