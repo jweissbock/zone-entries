@@ -196,7 +196,7 @@ class db(FlaskView):
 		homeOnIce = {}
 		awayOnIce = {}
 		temp = {}
-		eDefault = [0]*4
+		eDefault = [0]*5
 		# for each returned item
 		for e in exitsData:
 			# match the keys, get which oniceTeamStat
@@ -215,11 +215,16 @@ class db(FlaskView):
 
 		# calculate the percents
 		for temp in [homeOnIce, awayOnIce]:
+			teamPCode = 'h' if temp == homeOnIce else 'v'
 			for row in temp:
 				temp[row][1] = float(temp[row][1]) / float(temp[row][0])
 				temp[row][2] = float(temp[row][2]) / float(temp[row][0])
 				temp[row][1] = math.ceil(temp[row][1] * 1000.0) / 1000.0
 				temp[row][2] = math.ceil(temp[row][2] * 1000.0) / 1000.0
+				temp[row][3] = players[teamPCode][str(row)]
+
+		print homeOnIce
+		print awayOnIce
 
 		# convert to lists
 		homeOnIce = [[x]+y for x,y in zip(homeOnIce.keys(), homeOnIce.values())]

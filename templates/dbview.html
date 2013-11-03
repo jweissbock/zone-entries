@@ -12,7 +12,7 @@ a {
 
 <head><title>Game Report</title></head>
 
-<p><a href="{{ url_for('index') }}">Home</a> | <a href="#indiv">Individual Data</a> | <a href="#onice">On Ice Data</a></p>
+<p><a href="{{ url_for('index') }}">Home</a> | <a href="#indiv">Individual Data</a> | <a href="#onice">While On Ice Data</a></p>
 
 <a name="indiv"></a>
 <h2>Individual Data</h2>
@@ -87,6 +87,7 @@ a {
 <table>
     <tr>
         <td>Number</td>
+        <td>Name</td>
         <td># Exit Attempts</td>
         <td>% Successful</td>
         <td>% w/ Possession</td>
@@ -94,6 +95,7 @@ a {
 {% for row in homeOnIce  %}
 <tr>
     <td>{{ row[0] }}</td>
+    <td>{{ row[4] }}</td>
     <td>{{ row[1] }}</td>
     <td>{{ row[2] }}</td>
     <td>{{ row[3] }}</td>
@@ -106,6 +108,7 @@ a {
 <table>
     <tr>
         <td>Number</td>
+        <td>Name</td>
         <td># Exit Attempts</td>
         <td>% Successful</td>
         <td>% w/ Possession</td>
@@ -113,6 +116,7 @@ a {
     {% for row in awayOnIce  %}
 <tr>
     <td>{{ row[0] }}</td>
+    <td>{{ row[4] }}</td>
     <td>{{ row[1] }}</td>
     <td>{{ row[2] }}</td>
     <td>{{ row[3] }}</td>
