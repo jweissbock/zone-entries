@@ -34,7 +34,7 @@ class db(FlaskView):
 		if team not in teamCodes:
 			error = "Team is not a valid code"
 		# get all game ides and location for this team
-		cur = g.db.execute('SELECT gameid, location FROM gameList WHERE teamCode = ?', [team])
+		cur = g.db.execute('SELECT gameid, location FROM gamelist WHERE teamCode = ?', [team])
 		allGames = cur.fetchall()
 		# need to check if team has any games
 		if allGames == []:
@@ -50,6 +50,7 @@ class db(FlaskView):
 			thisData = cur.fetchall()
 			if thisData != []:
 				allExits += thisData
+
 		#cur = g.db.execute('SELECT * FROM exits')
 		#allExits = cur.fetchall()
 		home = {}
@@ -125,6 +126,7 @@ class db(FlaskView):
 		default = [0]*8
 		error, error2 = None, None
 		data, data2 = [], []
+		allExitDict = {} # for the on ice data
 		
 		# loop through the chances
 		for location in ['H', 'A']:
@@ -147,12 +149,14 @@ class db(FlaskView):
 			if allData == []:
 				tempError = "Team does not have data."
 
-
 			# calculate stats
 			for d in allData:
 				total += 1
 				playerNum = d[7]
 				exittype = d[6]
+				# for each exit, store as a dictionary, period:time (key) = team, type
+				dictKey = "%s:%s:%s" % (d[4], d[5], d[3]) # period, time, tyeam
+				allExitDict[dictKey] = (d[3], d[6])
 				if playerNum not in mydata:
 					mydata[playerNum] = list(default)
 					if str(playerNum) not in players[teamPCode]:
@@ -174,7 +178,6 @@ class db(FlaskView):
 				myrow[6] = math.ceil(myrow[6] * 1000.0) / 1000.0
 				myrow[8] = float(myrow[4]) / myrow[2]	
 				myrow[8] = math.ceil(myrow[8] * 1000.0) / 1000.0
-				myrow[7] = '-'
 				tempData.append(myrow)		
 
 			# assign the variables now
@@ -185,5 +188,48 @@ class db(FlaskView):
 				error2 = tempError
 				data2 = tempData
 
+		# query all times for all players on ice, from dict.keys		
+		exitsList = ','.join(allExitDict.keys())
+		url = "http://sareon.pythonanywhere.com/toi/onice/?gameid=%s&exits=%s" % (oGameID, exitsList)
+		exitsData = json.loads(requests.get(url).text)
+
+		homeOnIce = {}
+		awayOnIce = {}
+		temp = {}
+		eDefault = [0]*4
+		# for each returned item
+		for e in exitsData:
+			# match the keys, get which oniceTeamStat
+			eData = allExitDict[e]
+			temp = homeOnIce if str(eData[0]) == '1' else awayOnIce
+			# for each returned player for this time
+			for pnum in exitsData[e]:
+				if pnum not in temp:
+					temp[pnum] = list(eDefault)
+				# update with the exit type, total on ice exits
+				temp[pnum][0] += 1
+				if eData[1] in ['P', 'C']:
+					temp[pnum][1] += 1
+				if eData[1] in ['P', 'C', 'CH', 'FC', 'FP', 'X']:
+					temp[pnum][2] += 1
+
+		# calculate the percents
+		for temp in [homeOnIce, awayOnIce]:
+			for row in temp:
+				temp[row][1] = float(temp[row][1]) / float(temp[row][0])
+				temp[row][2] = float(temp[row][2]) / float(temp[row][0])
+				temp[row][1] = math.ceil(temp[row][1] * 1000.0) / 1000.0
+				temp[row][2] = math.ceil(temp[row][2] * 1000.0) / 1000.0
+
+		# convert to lists
+		homeOnIce = [[x]+y for x,y in zip(homeOnIce.keys(), homeOnIce.values())]
+		awayOnIce = [[x]+y for x,y in zip(awayOnIce.keys(), awayOnIce.values())]
+
+		homeOnIce = sorted(homeOnIce, key=lambda x: int(x[0]))
+		awayOnIce = sorted(awayOnIce, key=lambda x: int(x[0]))
+		data = sorted(data, key=lambda x: int(x[0]))
+		data2 = sorted(data2, key=lambda x: int(x[0]))
+
 		return render_template('dbview.html', data=data, error=error,
-								error2=error2, data2=data2)
+								error2=error2, data2=data2,
+								homeOnIce=homeOnIce, awayOnIce=awayOnIce)

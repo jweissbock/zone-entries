@@ -5,9 +5,17 @@ td {
 .error {
     color: red;
 }
+a {
+    color: blue;
+}
 </style>
 
-<p>Individual Data | On Ice Data</p>
+<head><title>Game Report</title></head>
+
+<p><a href="{{ url_for('index') }}">Home</a> | <a href="#indiv">Individual Data</a> | <a href="#onice">On Ice Data</a></p>
+
+<a name="indiv"></a>
+<h2>Individual Data</h2>
 
 <p><strong>Home Team</strong></p>
 
@@ -19,13 +27,12 @@ td {
   <tr>
     <td>#</td>
     <td>Name</td>
-    <td># of exit</td>
+    <td># of exit attempts</td>
     <td># Failed</td>
     <td># Successful</td> 
     <td>% Successful</td>
     <td># w/ Possession</td>
     <td>% w/ Possession</td>
-    <td>% of posession attempts when on ice</td>
   </tr>
 
  {% for row in data %}
@@ -38,7 +45,6 @@ td {
     <td>{{ row[8] }}</td>
     <td>{{ row[5] }}</td>
     <td>{{ row[6] }}</td>
-    <td>{{ row[7] }}</td>
 </tr>
  {% endfor %}   
 </table>
@@ -52,13 +58,12 @@ td {
   <tr>
     <td>#</td>
     <td>Name</td>
-    <td># of exits</td>
+    <td># of exits attempts</td>
     <td># Failed</td>
     <td># Successful</td>
     <td>% Successful</td> 
     <td># w/ Possession</td>
     <td>% w/ Possession</td>
-    <td>% of posession attempts when on ice</td>
   </tr>
  {% for row in data2 %}
 <tr>
@@ -70,7 +75,47 @@ td {
     <td>{{ row[8] }}</td>
     <td>{{ row[5] }}</td>
     <td>{{ row[6] }}</td>
-    <td>{{ row[7] }}</td>
 </tr>
  {% endfor %} 
   </table>
+
+<a name="onice"></a>
+<h2>On Ice Data</h2>
+
+<p><strong>Home Team</strong></p>
+
+<table>
+    <tr>
+        <td>Number</td>
+        <td># Exit Attempts</td>
+        <td>% Successful</td>
+        <td>% w/ Possession</td>
+    </tr>
+{% for row in homeOnIce  %}
+<tr>
+    <td>{{ row[0] }}</td>
+    <td>{{ row[1] }}</td>
+    <td>{{ row[2] }}</td>
+    <td>{{ row[3] }}</td>
+</tr>
+{% endfor %}
+    </table>
+
+<p><strong>Away Team</strong></p>
+
+<table>
+    <tr>
+        <td>Number</td>
+        <td># Exit Attempts</td>
+        <td>% Successful</td>
+        <td>% w/ Possession</td>
+    </tr>
+    {% for row in awayOnIce  %}
+<tr>
+    <td>{{ row[0] }}</td>
+    <td>{{ row[1] }}</td>
+    <td>{{ row[2] }}</td>
+    <td>{{ row[3] }}</td>
+</tr>
+{% endfor %}
+    </table>
